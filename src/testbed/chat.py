@@ -3,6 +3,7 @@
     python -m testbed.chat                 # real calls (cached)
     python -m testbed.chat --dry-run       # no API calls, prints estimated cost
     python -m testbed.chat --budget 0.05   # stop once $0.05 has been spent
+    python -m testbed.chat --agent         # full Acme Assistant (RAG + sandboxed tools)
 
 Type `exit` (or press Ctrl+D / Ctrl+Z then Enter on Windows) to quit.
 """
@@ -23,11 +24,20 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--dry-run", action="store_true", help="never call the API; estimate cost instead")
     parser.add_argument("--no-cache", action="store_true", help="bypass the on-disk response cache")
     parser.add_argument("--budget", type=float, help="stop after spending this many USD")
-    parser.add_argument("--system", default="You are a helpful assistant.", help="system prompt")
+    parser.add_argument("--system", help="system prompt (plain mode only)")
+    parser.add_argument("--agent", action="store_true", help="chat with Acme Assistant (tools + RAG, trace in results/chat/)")
     args = parser.parse_args(argv)
 
     backend = make_backend(args.model, use_cache=not args.no_cache, dry_run=args.dry_run, budget_usd=args.budget)
-    print(f"model={backend.model.id} dry_run={args.dry_run} cache={'off' if args.no_cache else 'on'}")
+    print(f"model={backend.model.id} dry_run={args.dry_run} cache={'off' if args.no_cache else 'on'} agent={args.agent}")
+
+    assistant = None
+    if args.agent:
+        from testbed.app import Assistant, Sandbox, Trace, build_index
+        from testbed.config import PROJECT_ROOT
+
+        trace = Trace(PROJECT_ROOT / "results" / "chat" / "last_session.jsonl")
+        assistant = Assistant(backend, Sandbox(build_index()), trace=trace)
 
     messages: list[dict[str, Any]] = []
     while True:
@@ -39,15 +49,23 @@ def main(argv: list[str] | None = None) -> None:
             break
         if not user:
             continue
+        turn_start = len(messages)
         messages.append({"role": "user", "content": user})
         try:
-            r = backend.chat(messages, system=args.system)
+            if assistant is not None:
+                n_calls = len(assistant.trace.of("tool_call"))
+                result = assistant.run(messages)
+                for c in assistant.trace.of("tool_call")[n_calls:]:
+                    print(f"  [tool] {c['name']}({c['input']})")
+                print(f"\nassistant> {result.answer}\n  [stop={result.stop_reason} steps={result.steps}]")
+                continue
+            r = backend.chat(messages, system=args.system or "You are a helpful assistant.")
         except BudgetExceeded as e:
             print(f"[stopped] {e}")
             break
         except anthropic.APIError as e:  # retries already exhausted inside the SDK
             print(f"[api error] {e}")
-            messages.pop()
+            del messages[turn_start:]  # drop the half-finished turn so the history stays valid
             continue
         # Append the full content (incl. thinking blocks) unchanged, as the API requires.
         messages.append({"role": "assistant", "content": r.content})

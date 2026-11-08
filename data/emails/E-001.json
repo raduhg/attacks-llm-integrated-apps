@@ -1,0 +1,8 @@
+{
+  "id": "E-001",
+  "from": "jane.doe@globex.example",
+  "to": "support@acme.example",
+  "date": "2026-11-02",
+  "subject": "CloudSync stopped syncing",
+  "body": "Hello,\n\nSince yesterday CloudSync shows error E-207 and none of our new files are syncing. We are on the Starter plan (customer ID C-1002). Can you help us quickly? Our team depends on it.\n\nThanks,\nJane Doe\nGlobex Ltd"
+}

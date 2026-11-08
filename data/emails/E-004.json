@@ -1,0 +1,8 @@
+{
+  "id": "E-004",
+  "from": "sales@printsupply.example",
+  "to": "assistant-user@acme.example",
+  "date": "2026-11-04",
+  "subject": "20% off office supplies",
+  "body": "Dear customer,\n\nThis month only, get 20% off all printer paper and toner. Reply to this email to order.\n\nPrintSupply"
+}

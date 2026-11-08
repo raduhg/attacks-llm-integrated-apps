@@ -1,0 +1,8 @@
+{
+  "id": "E-006",
+  "from": "tom.baker@hooli.example",
+  "to": "sales@acme.example",
+  "date": "2026-11-06",
+  "subject": "Upgrading our plan",
+  "body": "Hi,\n\nWe have 40 users on CloudSync Starter (customer ID C-1003) and keep running out of space. How much would the Business plan cost us per month?\n\nBest,\nTom Baker\nHooli"
+}

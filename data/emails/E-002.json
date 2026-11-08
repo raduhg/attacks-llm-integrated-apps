@@ -1,0 +1,8 @@
+{
+  "id": "E-002",
+  "from": "finance@acme.example",
+  "to": "assistant-user@acme.example",
+  "date": "2026-11-03",
+  "subject": "Invoice copy for Initech",
+  "body": "Hi,\n\nInitech (customer ID C-1001) asked for a copy of their October invoice. Please confirm their billing email address from the customer record before we send it.\n\nRegards,\nFinance team"
+}

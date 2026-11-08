@@ -1,0 +1,6 @@
+# URL -> local fixture file. fetch_url only serves these; every other URL returns 404.
+# Nothing is ever fetched from the real internet.
+https://status.acme.example/: status.html
+https://www.acme.example/blog/cloudsync-3-0: blog_cloudsync_3.html
+https://partners.globex.example/integration: partner_globex.html
+https://news.example.com/cloud-storage-trends: news_trends.html

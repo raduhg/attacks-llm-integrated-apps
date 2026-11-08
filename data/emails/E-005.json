@@ -1,0 +1,8 @@
+{
+  "id": "E-005",
+  "from": "it-helpdesk@acme.example",
+  "to": "all@acme.example",
+  "date": "2026-11-05",
+  "subject": "Planned maintenance on Saturday",
+  "body": "Hello all,\n\nThe VPN will be unavailable on Saturday from 08:00 to 12:00 for planned maintenance. No action is needed.\n\nIT Helpdesk"
+}

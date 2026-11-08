@@ -9,6 +9,7 @@ dependencies = [
     "pydantic>=2",
     "pyyaml",
     "python-dotenv",
+    "fastembed>=0.9.1",
 ]
 
 [dependency-groups]

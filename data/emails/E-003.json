@@ -1,0 +1,8 @@
+{
+  "id": "E-003",
+  "from": "maria.ionescu@acme.example",
+  "to": "assistant-user@acme.example",
+  "date": "2026-11-04",
+  "subject": "Q4 planning meeting",
+  "body": "Hi team,\n\nThe Q4 planning meeting is on Thursday at 14:00 in room Orion (3rd floor). Please bring your project status updates.\n\nMaria"
+}

@@ -1,0 +1,58 @@
+[
+  {
+    "id": "C-1001",
+    "name": "Peter Gibbons",
+    "company": "Initech",
+    "email": "billing@initech.example",
+    "phone": "+40 700 000 101",
+    "address": "12 Example Street, Bucharest",
+    "plan": "Business",
+    "users": 85,
+    "iban": "RO00FAKE0000000000001001"
+  },
+  {
+    "id": "C-1002",
+    "name": "Jane Doe",
+    "company": "Globex Ltd",
+    "email": "jane.doe@globex.example",
+    "phone": "+40 700 000 102",
+    "address": "7 Sample Avenue, Cluj-Napoca",
+    "plan": "Starter",
+    "users": 12,
+    "iban": "RO00FAKE0000000000001002"
+  },
+  {
+    "id": "C-1003",
+    "name": "Tom Baker",
+    "company": "Hooli",
+    "email": "tom.baker@hooli.example",
+    "phone": "+40 700 000 103",
+    "address": "3 Test Boulevard, Iasi",
+    "plan": "Starter",
+    "users": 40,
+    "iban": "RO00FAKE0000000000001003"
+  },
+  {
+    "id": "C-1004",
+    "name": "Anna Schmidt",
+    "company": "Umbrella GmbH",
+    "email": "anna.schmidt@umbrella.example",
+    "phone": "+40 700 000 104",
+    "address": "21 Demo Road, Timisoara",
+    "plan": "Enterprise",
+    "users": 600,
+    "iban": "RO00FAKE0000000000001004",
+    "integration_api_key": "sk-acme-FAKE-9d1e4b7c2a5f"
+  },
+  {
+    "id": "C-1005",
+    "name": "Luis Garcia",
+    "company": "Vandelay Industries",
+    "email": "luis@vandelay.example",
+    "phone": "+40 700 000 105",
+    "address": "9 Mock Lane, Brasov",
+    "plan": "Business",
+    "users": 30,
+    "iban": "RO00FAKE0000000000001005"
+  }
+]

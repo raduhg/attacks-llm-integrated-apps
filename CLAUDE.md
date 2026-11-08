@@ -31,16 +31,16 @@ Every design decision should favour **reproducibility, measurability and clarity
 
 - **Language:** Python 3.11+. Must run on Windows, macOS and Linux (use `pathlib`, no shell-specific scripts; provide plain `python -m ...` entry points).
 - **LLMs: API only. No local LLMs (no Ollama, no llama.cpp, no local model weights).**
-  - **Anthropic API** (primary): use the official `anthropic` Python SDK. Use a cheap model (Claude Haiku tier) for development and bulk runs, and optionally a stronger model (Sonnet tier) for comparison. Keep model names in `config/models.yaml`, never hard-coded.
-  - **OpenAI-compatible APIs** (optional, later): same interface, so experiments can compare providers.
+  - **Anthropic API** (only provider): use the official `anthropic` Python SDK. **Model: Claude Haiku 5.5 (`claude-haiku-5-5`) only, for now.** Keep model names in `config/models.yaml`, never hard-coded.
+  - **No second provider** (decided: no OpenAI-compatible backend).
   - All backends implement one small interface (`chat(messages, tools) -> response`) that also returns token usage, so cost can be tracked per run.
   - Read keys from a `.env` file (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`). Never hard-code, log or commit keys.
 - **Cost control (important, since every call costs money):**
-  - A **response cache** keyed by (model, messages, tools, temperature), stored on disk, so re-running analysis or a crashed experiment does not repeat paid calls.
+  - A **response cache** keyed by the exact request parameters (model, system, messages, tools, effort, ...) **plus the repetition index**, stored on disk, so re-running analysis or a crashed experiment does not repeat paid calls, while the N repetitions stay N independent calls.
   - A **dry-run mode** that prints the number of planned calls and an estimated cost without calling the API.
   - A configurable **budget limit** per experiment: stop cleanly when it is reached.
   - Retries with exponential backoff for rate limits (HTTP 429/529).
-- **RAG:** a simple local vector store (ChromaDB or FAISS) with a small local **embedding** model (e.g. `sentence-transformers/all-MiniLM-L6-v2`). This is not an LLM and runs on CPU, so it does not conflict with the API-only rule. Keep RAG simple; its quality is not the research question.
+- **RAG:** no vector database (decided: the corpus is ~100 chunks, so ChromaDB/FAISS add nothing). Embeddings are kept in a numpy array and searched by brute-force cosine similarity. The embedding model is `sentence-transformers/all-MiniLM-L6-v2` run through **fastembed** (ONNX, CPU, no PyTorch). This is not an LLM, so it does not conflict with the API-only rule. Retrieval happens only when the model calls the `search_documents` tool (no automatic context stuffing). Keep RAG simple; its quality is not the research question.
 - **Avoid heavy frameworks** (no LangChain/LlamaIndex unless clearly needed). Write the agent loop by hand so every step is visible and explainable in the thesis.
 - **Demo UI:** a minimal Streamlit app, so I can show attacks live at the defense. Low priority; build it last.
 - **Data/analysis:** pandas, matplotlib (or seaborn) for charts.
@@ -96,6 +96,8 @@ Each defense is a separate, independently toggleable module with a common interf
   - **False positive rate** (benign requests blocked by a defense)
   - Added latency and added tokens/cost per request
 - **Repetitions:** LLM output is non-deterministic. Run every (attack × defense × model) combination **N times (default N=5)** at a fixed temperature, and record the seed where the backend supports one. Report mean ± standard deviation or a confidence interval.
+  - Temperature is **1.0** (decided). Claude Haiku 5.5 rejects any non-default sampling parameter, so none is sent and the API default (1.0) applies. The API has no seed parameter.
+  - Adaptive thinking is on (model default) with effort `medium`; thinking tokens count in all token/cost figures.
 - **Results** saved to `results/<experiment_id>/` as raw JSONL traces plus an aggregated CSV, with the full config snapshot, model names/versions, timestamp and git commit hash for reproducibility.
 - **Charts for the thesis:** ASR heatmap (defense × attack category), bar charts of ASR vs. false positive rate per defense, a security vs. usability trade-off scatter plot, and per-model comparison.
 
@@ -159,8 +161,11 @@ Disertatie/
 - When you finish a milestone, give me a short summary: what was built, how to run it, and any decisions I should know about for the methodology chapter.
 - If something in this document is ambiguous, ask instead of guessing.
 
-## Open points to confirm with me
+## Confirmed decisions (2026-11-08)
 
-- The exact models to compare and the total API budget for the full experiment matrix (give me a cost estimate first).
-- Whether to add a second provider (OpenAI-compatible) for comparison.
-- Whether the thesis text and charts should be labelled in Romanian or English.
+- **Model:** Claude Haiku 5.5 only for now. **Total API budget: $10** (still give me a cost estimate before the full matrix).
+- **Provider:** Anthropic only, no second provider.
+- **Language:** thesis charts, labels and the fake corpus are in **English** (Romanian appears only as an attack obfuscation variant).
+- **Cache key** includes the repetition index; **temperature** 1.0 (API default, not settable on this model).
+- **RAG:** numpy brute-force search + fastembed (`all-MiniLM-L6-v2`), no vector database.
+- **Environment:** uv with a committed `uv.lock`; the README also documents plain `python -m venv` + pip.
