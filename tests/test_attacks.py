@@ -72,10 +72,23 @@ def test_injecagent_enhanced_conversion() -> None:
     assert load_attacks(ATTACKS_DIR / "m5_enhanced.yaml") == enhanced  # committed file is up to date
 
 
+def test_leakage_catalogue() -> None:
+    from testbed.attacks.leakage import leakage_attacks
+
+    attacks = leakage_attacks()
+    assert all(a.category == "system_prompt_leakage" for a in attacks)
+    assert all(a.success[0].type == "canary_in_output" for a in attacks)
+    assert {a.vector for a in attacks} == {"direct", "indirect"}
+    assert load_attacks(ATTACKS_DIR / "m6_leakage.yaml") == attacks  # committed file is up to date
+
+
 def test_user_task_links_match_benign_prompts() -> None:
     tasks = tasks_by_id()
-    for a in load_attacks(ATTACKS_DIR / "m3_initial.yaml") + load_attacks(ATTACKS_DIR / "m5_enhanced.yaml"):
-        assert a.user_task in tasks and tasks[a.user_task].prompt == a.user_prompt, a.id
+    files = ["m3_initial.yaml", "m5_enhanced.yaml", "m6_leakage.yaml"]
+    for f in files:
+        for a in load_attacks(ATTACKS_DIR / f):
+            if a.user_task:
+                assert a.user_task in tasks and tasks[a.user_task].prompt == a.user_prompt, a.id
 
 
 def test_user_task_completed(sandbox: Sandbox) -> None:
