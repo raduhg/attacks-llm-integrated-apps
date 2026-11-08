@@ -10,6 +10,8 @@ dependencies = [
     "pyyaml",
     "python-dotenv",
     "fastembed>=0.9.1",
+    "pandas>=3.1.1",
+    "pyarrow>=26.0.1",
 ]
 
 [dependency-groups]
