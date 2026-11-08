@@ -1,0 +1,23 @@
+# Model registry. Code refers to models by their short key (e.g. "haiku"), never by ID.
+#
+# Sampling: Claude Haiku 5.5 rejects any non-default temperature/top_p/top_k with HTTP 400,
+# so the backend never sends them. Every run therefore uses the API default temperature (1.0).
+#
+# Prices are USD per million tokens (Anthropic first-party API, checked 2026-11-08).
+
+default: haiku
+max_retries: 5            # SDK retries 408/409/429/5xx (incl. 529) with exponential backoff
+
+models:
+  haiku:
+    id: claude-haiku-5-5
+    max_tokens: 8000      # thinking tokens count toward this cap, so leave headroom
+    effort: medium        # the model's default, set explicitly so it is recorded in every run
+    thinking: null        # null = model default (adaptive thinking, on)
+    # shortcut: prompt-length > 100K tokens is billed at 5x these rates; our prompts are far below that.
+    price_per_mtok:
+      input: 0.10
+      output: 0.50
+      cache_read: 0.01
+      cache_write: 0.125
+    dry_run_output_tokens: 600   # assumed output (incl. thinking) per call for dry-run estimates
