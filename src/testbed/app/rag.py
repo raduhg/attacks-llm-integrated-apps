@@ -24,6 +24,9 @@ os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")  # harmless on Win
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 EMBEDDING_CACHE = PROJECT_ROOT / ".cache" / "embeddings"
 CORPUS_DIR = PROJECT_ROOT / "data" / "corpus"
+# Chunks returned per search. Raised from 3 to 5 after the Milestone 4 baseline: MiniLM ranks
+# exact codes (e.g. "E-207") poorly, and k=3 missed the right section in 2 of 5 runs of B05.
+TOP_K = 5
 
 
 @dataclass(frozen=True)
@@ -68,7 +71,7 @@ class DocumentIndex:
         new._vectors = np.vstack([self._vectors, np.array(list(self._model.embed([c.text for c in extra])))])
         return new
 
-    def search(self, query: str, k: int = 3) -> list[Chunk]:
+    def search(self, query: str, k: int = TOP_K) -> list[Chunk]:
         """Return the k chunks most similar to `query`."""
         q = next(iter(self._model.embed([query])))
         scores = self._vectors @ q  # fastembed returns unit vectors, so dot product = cosine

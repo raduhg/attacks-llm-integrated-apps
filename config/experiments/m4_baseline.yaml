@@ -1,0 +1,11 @@
+# Milestone 4: baseline (no defense) over the first attack set and the benign smoke set.
+#   python -m testbed.evaluation.run config/experiments/m4_baseline.yaml --dry-run
+id: m4_baseline
+description: Baseline D0, 10 InjecAgent attacks + 11 benign tasks, N=5
+model: haiku
+repetitions: 5
+budget_usd: 0.50
+corpus: clean
+defenses: [D0]
+attacks: [data/attacks/m3_initial.yaml]
+benign: [data/benign_tasks/m2_smoke.yaml]

@@ -92,7 +92,7 @@ TOOLS: list[dict[str, Any]] = [
 class Searchable(Protocol):
     """Anything with a `search(query) -> chunks` method (DocumentIndex, or a fake in tests)."""
 
-    def search(self, query: str, k: int = 3) -> list[Chunk]: ...
+    def search(self, query: str, k: int = ...) -> list[Chunk]: ...
 
 
 @dataclass
