@@ -140,7 +140,7 @@ def test_trace_file_is_jsonl(sandbox: Sandbox, tmp_path) -> None:  # type: ignor
 
 
 def test_benign_task_file_is_valid() -> None:
-    assert len(load_tasks(TASKS_DIR / "m2_smoke.yaml")) == 10
+    assert len(load_tasks(TASKS_DIR / "m2_smoke.yaml")) == 11
 
 
 def test_check_task() -> None:

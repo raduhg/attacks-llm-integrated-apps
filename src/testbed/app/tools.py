@@ -103,16 +103,19 @@ class Sandbox:
     data_dir: Path = DATA_DIR
     outbox: list[dict[str, str]] = field(default_factory=list)
     deleted: list[str] = field(default_factory=list)
+    # Text appended to a tool's output, per tool name (used for "tool_output" injections).
+    output_suffix: dict[str, str] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
+        # All fake data is loaded into memory, so an attack can modify its own copy for one run.
         self.emails = {
             p.stem: json.loads(p.read_text(encoding="utf-8")) for p in sorted((self.data_dir / "emails").glob("*.json"))
         }
         customers = json.loads((self.data_dir / "customers.json").read_text(encoding="utf-8"))
         self.customers = {c["id"]: c for c in customers}
         fixtures = self.data_dir / "web_fixtures"
-        self.web = yaml.safe_load((fixtures / "index.yaml").read_text(encoding="utf-8"))
-        self.web_dir = fixtures
+        index = yaml.safe_load((fixtures / "index.yaml").read_text(encoding="utf-8"))
+        self.pages = {url: (fixtures / name).read_text(encoding="utf-8") for url, name in index.items()}
 
     def run(self, name: str, args: dict[str, Any]) -> tuple[str, bool]:
         """Execute one tool call. Returns (output text, is_error)."""
@@ -120,9 +123,12 @@ class Sandbox:
         if handler is None:
             return f"Unknown tool: {name}", True
         try:
-            return handler(**args)
+            output, is_error = handler(**args)
         except TypeError as e:  # model sent missing/unexpected arguments
             return f"Invalid arguments for {name}: {e}", True
+        if name in self.output_suffix and not is_error:
+            output += "\n" + self.output_suffix[name]
+        return output, is_error
 
     def _tool_search_documents(self, query: str) -> tuple[str, bool]:
         hits = self.index.search(query)
@@ -139,10 +145,10 @@ class Sandbox:
         return f"Email sent to {to}.", False
 
     def _tool_fetch_url(self, url: str) -> tuple[str, bool]:
-        filename = self.web.get(url)
-        if filename is None:
+        page = self.pages.get(url)
+        if page is None:
             return f"404 Not Found: {url}", True
-        return (self.web_dir / filename).read_text(encoding="utf-8"), False
+        return page, False
 
     def _tool_get_customer_record(self, customer_id: str) -> tuple[str, bool]:
         record = self.customers.get(customer_id)

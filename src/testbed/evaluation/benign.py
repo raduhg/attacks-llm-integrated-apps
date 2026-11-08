@@ -37,6 +37,11 @@ def load_tasks(path: Path) -> list[BenignTask]:
     return [BenignTask.model_validate(t) for t in yaml.safe_load(path.read_text(encoding="utf-8"))]
 
 
+def tasks_by_id(directory: Path = TASKS_DIR) -> dict[str, BenignTask]:
+    """Every benign task in every YAML file of `directory`, keyed by ID."""
+    return {t.id: t for p in sorted(directory.glob("*.yaml")) for t in load_tasks(p)}
+
+
 def check_task(task: BenignTask, answer: str, tool_calls: list[dict[str, Any]]) -> list[str]:
     """Return the reasons the task failed; an empty list means it passed."""
     failures = []

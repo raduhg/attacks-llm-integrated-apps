@@ -10,6 +10,7 @@ Deliberately minimal, because retrieval quality is not the research question:
 
 from __future__ import annotations
 
+import copy
 import os
 from dataclasses import dataclass
 from pathlib import Path
@@ -33,16 +34,16 @@ class Chunk:
     text: str
 
 
+def _split_sections(markdown: str) -> list[str]:
+    """One piece per "## " section; text before the first section is its own piece."""
+    parts = markdown.split("\n## ")
+    texts = [parts[0].strip()] + ["## " + p.strip() for p in parts[1:]]
+    return [t for t in texts if t.strip("# ")]
+
+
 def load_chunks(corpus_dir: Path) -> list[Chunk]:
     """Split every .md file in `corpus_dir` into sections, in a stable (sorted) order."""
-    chunks: list[Chunk] = []
-    for path in sorted(corpus_dir.glob("*.md")):
-        sections = path.read_text(encoding="utf-8").split("\n## ")
-        for i, section in enumerate(sections):
-            text = section.strip() if i == 0 else "## " + section.strip()
-            if text:
-                chunks.append(Chunk(path.name, text))
-    return chunks
+    return [Chunk(p.name, t) for p in sorted(corpus_dir.glob("*.md")) for t in _split_sections(p.read_text(encoding="utf-8"))]
 
 
 class DocumentIndex:
@@ -57,6 +58,15 @@ class DocumentIndex:
             raise ValueError(f"No .md documents found in {corpus_dir}")
         self._model = TextEmbedding(EMBEDDING_MODEL, cache_dir=str(EMBEDDING_CACHE))
         self._vectors = np.array(list(self._model.embed([c.text for c in self.chunks])))
+
+    def with_document(self, doc: str, markdown: str) -> DocumentIndex:
+        """A copy of this index with one extra document added; the original is unchanged.
+        Used to inject a document for a single attack run without re-embedding the corpus."""
+        extra = [Chunk(doc, t) for t in _split_sections(markdown)]
+        new = copy.copy(self)
+        new.chunks = self.chunks + extra
+        new._vectors = np.vstack([self._vectors, np.array(list(self._model.embed([c.text for c in extra])))])
+        return new
 
     def search(self, query: str, k: int = 3) -> list[Chunk]:
         """Return the k chunks most similar to `query`."""
