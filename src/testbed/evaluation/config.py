@@ -8,8 +8,7 @@ import yaml
 from pydantic import BaseModel, Field, field_validator
 
 from testbed.config import PROJECT_ROOT
-
-KNOWN_DEFENSES = {"D0"}  # D1..D6 are added in Milestone 5
+from testbed.defenses import KNOWN_DEFENSES
 
 
 class ExperimentConfig(BaseModel):
@@ -30,7 +29,7 @@ class ExperimentConfig(BaseModel):
     @field_validator("defenses")
     @classmethod
     def _known(cls, v: list[str]) -> list[str]:
-        unknown = set(v) - KNOWN_DEFENSES
+        unknown = set(v) - set(KNOWN_DEFENSES)
         if unknown or not v:
             raise ValueError(f"Unknown or empty defenses: {sorted(unknown)}; known: {sorted(KNOWN_DEFENSES)}")
         return v

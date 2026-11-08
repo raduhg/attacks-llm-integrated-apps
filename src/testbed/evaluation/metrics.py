@@ -66,6 +66,7 @@ def _summarise(key: tuple[str, str, str, str], rows: list[dict[str, Any]]) -> di
         "mean_input_tokens": round(statistics.mean(r["input_tokens"] for r in rows), 1),
         "mean_output_tokens": round(statistics.mean(r["output_tokens"] for r in rows), 1),
         "mean_cost_usd": round(statistics.mean(r["cost_usd"] for r in rows), 6),
+        "mean_detector_cost_usd": round(statistics.mean(r.get("detector_cost_usd", 0) for r in rows), 6),
         "mean_latency_s": round(statistics.mean(r["latency_s"] for r in rows), 3),
     }
 

@@ -61,9 +61,20 @@ def test_injecagent_conversion() -> None:
     assert load_attacks(ATTACKS_DIR / "m3_initial.yaml") == convert(limit=10)  # committed file is up to date
 
 
+def test_injecagent_enhanced_conversion() -> None:
+    from testbed.attacks.import_injecagent import convert, enhanced_prefix
+
+    prefix = enhanced_prefix()
+    base, enhanced = convert(limit=10), convert(limit=10, setting="enhanced")
+    assert len(prefix) == 96
+    assert [e.payload for e in enhanced] == [prefix + b.payload for b in base]
+    assert [e.id for e in enhanced][:2] == ["IA-DSE-01", "IA-DSE-02"]
+    assert load_attacks(ATTACKS_DIR / "m5_enhanced.yaml") == enhanced  # committed file is up to date
+
+
 def test_user_task_links_match_benign_prompts() -> None:
     tasks = tasks_by_id()
-    for a in load_attacks(ATTACKS_DIR / "m3_initial.yaml"):
+    for a in load_attacks(ATTACKS_DIR / "m3_initial.yaml") + load_attacks(ATTACKS_DIR / "m5_enhanced.yaml"):
         assert a.user_task in tasks and tasks[a.user_task].prompt == a.user_prompt, a.id
 
 

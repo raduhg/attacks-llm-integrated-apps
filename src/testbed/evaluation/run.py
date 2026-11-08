@@ -34,6 +34,7 @@ from testbed.attacks.checkers import attack_succeeded, user_task_completed
 from testbed.attacks.inject import prepare
 from testbed.attacks.schema import Attack, load_attacks
 from testbed.config import PROJECT_ROOT
+from testbed.defenses import build_defense
 from testbed.evaluation.benign import BenignTask, check_task, load_tasks, tasks_by_id
 from testbed.evaluation.config import ExperimentConfig, load_experiment
 from testbed.evaluation.metrics import aggregate
@@ -43,13 +44,19 @@ RESULTS_DIR = PROJECT_ROOT / "results"
 
 
 def _usage_fields(trace: Trace) -> dict[str, Any]:
+    """Token/cost/latency for one run. Assistant calls (model_call) and the D1-LLM detector
+    (detector_call) are summed separately, so the detector's extra cost is reported on its own."""
     calls = trace.of("model_call")
+    det = trace.of("detector_call")
     return {
         "steps": len(calls),
         "input_tokens": sum(c["usage"]["input_tokens"] for c in calls),
         "output_tokens": sum(c["usage"]["output_tokens"] for c in calls),
         "cost_usd": round(sum(c["cost_usd"] for c in calls), 8),  # original cost, also for cache hits
         "latency_s": round(sum(c["latency_s"] for c in calls), 3),
+        "detector_calls": len(det),
+        "detector_cost_usd": round(sum(c["cost_usd"] for c in det), 8),
+        "detector_tokens": sum(c["usage"]["input_tokens"] + c["usage"]["output_tokens"] for c in det),
         "all_cached": all(c["cached"] for c in calls),
     }
 
@@ -58,7 +65,8 @@ def run_attack(attack: Attack, ctx: dict[str, Any], defense: str, rep: int, trac
     sandbox, messages = prepare(attack, ctx["index"])
     trace = Trace(trace_path)
     trace.log("attack", id=attack.id, category=attack.category, vector=attack.vector, defense=defense, repetition=rep)
-    result = Assistant(ctx["backend"], sandbox, trace=trace, max_steps=ctx["max_steps"]).run(messages, repetition=rep)
+    assistant = Assistant(ctx["backend"], sandbox, trace=trace, max_steps=ctx["max_steps"], defense=build_defense(defense))
+    result = assistant.run(messages, repetition=rep)
     fired = attack_succeeded(attack.success, trace, sandbox)
     done = user_task_completed(ctx["tasks"][attack.user_task], trace) if attack.user_task else None
     trace.log("attack_result", succeeded=bool(fired), checks_fired=fired, user_task_completed=done)
@@ -73,7 +81,8 @@ def run_attack(attack: Attack, ctx: dict[str, Any], defense: str, rep: int, trac
 def run_benign(task: BenignTask, ctx: dict[str, Any], defense: str, rep: int, trace_path: Path) -> dict[str, Any]:
     trace = Trace(trace_path)
     trace.log("benign_task", id=task.id, defense=defense, repetition=rep)
-    assistant = Assistant(ctx["backend"], Sandbox(ctx["index"]), trace=trace, max_steps=ctx["max_steps"])
+    assistant = Assistant(ctx["backend"], Sandbox(ctx["index"]), trace=trace, max_steps=ctx["max_steps"],
+                          defense=build_defense(defense))
     result = assistant.run([{"role": "user", "content": task.prompt}], repetition=rep)
     failures = check_task(task, result.answer, trace.of("tool_call"))
     trace.log("benign_result", passed=not failures, failures=failures)
