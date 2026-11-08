@@ -1,0 +1,12 @@
+# Milestone 6 probe: is the weaker Haiku 4.5 exploitable where Haiku 5.5 was not?
+# Lean: baseline only (D0), both attack sets, N=3, no benign tasks (not needed to answer the
+# question). Haiku 4.5 is 10x the price of 5.5, so this is kept small (~60 runs, ~$0.20).
+id: m6_haiku45_probe
+description: Haiku 4.5, D0 only, 10 base + 10 enhanced attacks, N=3
+model: haiku45
+repetitions: 3
+budget_usd: 0.40
+corpus: clean
+defenses: [D0]
+attacks: [data/attacks/m3_initial.yaml, data/attacks/m5_enhanced.yaml]
+benign: []

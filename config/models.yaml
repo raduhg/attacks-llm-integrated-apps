@@ -21,3 +21,17 @@ models:
       cache_read: 0.01
       cache_write: 0.125
     dry_run_output_tokens: 600   # assumed output (incl. thinking) per call for dry-run estimates
+
+  # Older, weaker model for the per-model comparison. Haiku 4.5 has no `effort` parameter and no
+  # adaptive thinking (both would error / do nothing), so they are null. 10x the price of 5.5.
+  haiku45:
+    id: claude-haiku-4-5
+    max_tokens: 4000
+    effort: null
+    thinking: null
+    price_per_mtok:
+      input: 1.00
+      output: 5.00
+      cache_read: 0.10
+      cache_write: 1.25
+    dry_run_output_tokens: 300   # no thinking, so less output than 5.5
