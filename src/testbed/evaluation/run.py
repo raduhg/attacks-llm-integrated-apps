@@ -126,7 +126,7 @@ def run_experiment(cfg: ExperimentConfig, backend: AnthropicBackend, index: Sear
 
 def write_summary(out: Path) -> list[dict[str, Any]]:
     """Aggregate runs.jsonl into summary.csv."""
-    rows = [json.loads(l) for l in (out / "runs.jsonl").read_text(encoding="utf-8").splitlines() if l.strip()]
+    rows = [json.loads(ln) for ln in (out / "runs.jsonl").read_text(encoding="utf-8").splitlines() if ln.strip()]
     summary = aggregate(rows)
     if summary:
         with (out / "summary.csv").open("w", newline="", encoding="utf-8") as f:
@@ -138,7 +138,8 @@ def write_summary(out: Path) -> list[dict[str, Any]]:
 
 def _git(*args: str) -> str:
     try:
-        return subprocess.run(["git", *args], cwd=PROJECT_ROOT, capture_output=True, text=True, check=True).stdout.strip()
+        cmd = ["git", *args]  # fixed arguments from this module, never user input, no shell
+        return subprocess.run(cmd, cwd=PROJECT_ROOT, capture_output=True, text=True, check=True).stdout.strip()  # noqa: S603
     except (OSError, subprocess.CalledProcessError):
         return "unknown"
 

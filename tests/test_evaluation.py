@@ -15,7 +15,6 @@ from testbed.evaluation.config import ExperimentConfig, load_experiment
 from testbed.evaluation.metrics import aggregate, wilson
 from testbed.evaluation.run import run_experiment, write_meta, write_summary
 from testbed.llm import AnthropicBackend
-from testbed.llm.base import LLMResponse, Usage
 
 CFG = dict(
     id="t", budget_usd=1.0, repetitions=2,
@@ -106,7 +105,7 @@ def test_run_experiment_writes_all_outputs(tmp_path: Path) -> None:
     write_meta(cfg, backend, tmp_path, status, "start")
     summary = write_summary(tmp_path)
 
-    runs = [json.loads(l) for l in (tmp_path / "runs.jsonl").read_text(encoding="utf-8").splitlines()]
+    runs = [json.loads(ln) for ln in (tmp_path / "runs.jsonl").read_text(encoding="utf-8").splitlines()]
     assert status["status"] == "completed" and len(runs) == status["runs_planned"] == 2 * (10 + 11)
     assert {r["repetition"] for r in runs} == {0, 1}
     assert not any(r["attack_success"] for r in runs if r["kind"] == "attack")  # model never called a tool

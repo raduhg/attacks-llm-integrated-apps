@@ -65,7 +65,7 @@ def enhanced_prefix(path: Path = ENHANCED_FILE) -> str:
 
 def convert(source: Path = SOURCE_FILE, limit: int | None = None, setting: str = "base") -> list[Attack]:
     """Read the JSONL file (as data only) and return validated Attack objects, in file order."""
-    lines = [l for l in source.read_text(encoding="utf-8").splitlines() if l.strip()]
+    lines = [ln for ln in source.read_text(encoding="utf-8").splitlines() if ln.strip()]
     tasks = tasks_by_id()
     prefix = enhanced_prefix() if setting == "enhanced" else ""
     tag, label = ("DSE", "data stealing, enhanced") if setting == "enhanced" else ("DS", "data stealing")

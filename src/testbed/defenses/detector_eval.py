@@ -81,7 +81,7 @@ def load_split(split: str, data_dir: Path = DATA_DIR) -> list[tuple[str, int]]:
 
     path = glob.glob(str(data_dir / f"{split}-*.parquet"))[0]
     df = pd.read_parquet(path)
-    return list(zip(df["text"].astype(str), df["label"].astype(int)))
+    return list(zip(df["text"].astype(str), df["label"].astype(int), strict=True))
 
 
 def regex_predicts(text: str) -> bool:

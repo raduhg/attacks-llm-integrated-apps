@@ -13,6 +13,8 @@ Two variants:
 
 from __future__ import annotations
 
+from typing import Any
+
 from testbed.defenses.base import Decision, Defense
 from testbed.defenses.patterns import injection_labels
 from testbed.llm.base import LLMBackend

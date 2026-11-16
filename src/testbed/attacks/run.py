@@ -12,9 +12,8 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from testbed.config import PROJECT_ROOT
-
 from testbed.attacks.schema import ATTACKS_DIR, load_attacks
+from testbed.config import PROJECT_ROOT
 
 
 def main(argv: list[str] | None = None) -> None:

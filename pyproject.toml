@@ -15,7 +15,10 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["pytest"]
+dev = [
+    "pytest",
+    "ruff>=0.17.5",
+]
 
 [build-system]
 requires = ["hatchling"]
@@ -26,3 +29,16 @@ packages = ["src/testbed"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 140
+target-version = "py311"
+
+[tool.ruff.lint]
+# E/W/F: errors and style; I: import order; S: security checks (the flake8-bandit rules); B: likely bugs
+select = ["E", "W", "F", "I", "S", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "S603", "S108"]  # asserts, running our own hook script, fake paths as test data
+".claude/hooks/audit_log.py" = ["S110"]  # the audit hook must never break a session; not ours to change
+"src/testbed/evaluation/run.py" = ["S607"]  # `git` is resolved from PATH on purpose (cross-platform)

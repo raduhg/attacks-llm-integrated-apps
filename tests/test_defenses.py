@@ -11,7 +11,7 @@ from typing import Any
 import pytest
 
 from testbed.defenses import KNOWN_DEFENSES, build_defense
-from testbed.defenses.base import Decision, Defense, DefenseStack
+from testbed.defenses.base import Defense, DefenseStack
 from testbed.defenses.d1_input_filter import REFUSAL, REMOVED_NOTICE, D1InputFilter
 from testbed.defenses.d3_spotlighting import MARKER
 from testbed.defenses.patterns import injection_labels, redact, secret_labels

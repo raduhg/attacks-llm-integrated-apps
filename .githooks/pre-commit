@@ -1,0 +1,19 @@
+#!/bin/sh
+# Local control for risk R1 (secret leakage): refuse a commit that stages the key file or
+# anything that looks like an API key. Enable once per clone:
+#     git config core.hooksPath .githooks
+# CI runs gitleaks on every pull request as the second line; this hook is the first.
+
+if git diff --cached --name-only | grep -qE '(^|/)\.env$'; then
+    echo "pre-commit: the .env file is staged. Unstage it: git restore --staged .env" >&2
+    exit 1
+fi
+
+# Anthropic keys, GitHub tokens, AWS access key IDs, private key blocks.
+pattern='sk-ant-[A-Za-z0-9_-]{20,}|gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----'
+if git diff --cached -U0 | grep -E '^\+' | grep -qE -- "$pattern"; then
+    echo "pre-commit: a staged change looks like a secret (API key, token or private key)." >&2
+    echo "Remove it, and rotate the credential if it was ever committed or pushed." >&2
+    exit 1
+fi
+exit 0

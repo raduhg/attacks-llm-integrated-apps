@@ -1,0 +1,96 @@
+# CI for every pull request and for main. Each job guards a risk in docs/security-risk-project.md.
+#
+# Supply-chain rules for this file (risk R4):
+#   - every third-party action is pinned to a full commit SHA (the tag is in the comment);
+#   - the workflow token is read-only; no job needs to write to the repository;
+#   - no secrets are used: tests are offline and never call the paid API (risk R8).
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: lint          # R5 unsafe code patterns, R6 defects: ruff incl. security (S) rules
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          python-version: "3.11"
+          enable-cache: true
+      - run: uv sync --locked
+      - run: uv run ruff check .
+
+  test:
+    name: test          # R6 wrong measurements, R7 broken guard hook or memory index
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          python-version: "3.11"
+          enable-cache: true
+      - name: Cache the embedding model (downloaded once from Hugging Face)
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .cache/embeddings
+          key: embeddings-all-MiniLM-L6-v2
+      - run: uv sync --locked
+      - run: uv run pytest -q
+
+  security:
+    name: security      # R1 secret leakage, R4 vulnerable dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0   # scan the whole history, not only the last commit
+      - name: Secret scan (gitleaks)
+        uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_COMMENTS: "false"   # commenting would need write permission
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          python-version: "3.11"
+      - name: Dependency vulnerability audit (pip-audit on the locked versions)
+        run: |
+          uv export --locked --no-emit-project --format requirements-txt -o requirements-audit.txt -q
+          uvx pip-audit -r requirements-audit.txt --disable-pip
+
+  build:
+    name: build         # R6 the package must install and import as released
+    runs-on: ubuntu-latest
+    needs: [lint, test, security]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          python-version: "3.11"
+      - run: uv build
+      - name: Install the built wheel in a clean environment and import it
+        run: |
+          uv venv /tmp/wheel-check
+          uv pip install --python /tmp/wheel-check dist/*.whl
+          /tmp/wheel-check/bin/python -c "import testbed.llm, testbed.defenses; print('ok')"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dist
+          path: dist/
