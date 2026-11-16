@@ -64,6 +64,8 @@ git config core.hooksPath .githooks
 Pipeline hardening (R3, R4), checked by `tests/test_ci_config.py`:
 
 - Every third-party action is pinned to a full commit SHA, with the release tag in a comment.
+- gitleaks runs as a downloaded binary fixed by version and SHA-256 checksum, not through a
+  third-party action (the action failed on its first run here without a usable error).
 - `permissions: contents: read` at workflow level, and no job widens it.
 - No secret other than the automatic `GITHUB_TOKEN` is referenced. The paid API key is never in CI.
 - `persist-credentials: false` on checkout, so the token is not left in the working copy.
@@ -86,5 +88,5 @@ Evidence to collect once the repository is on GitHub:
 ## Status
 
 Implemented and verified locally: lint, tests, dependency audit, build, the pre-commit hook and
-the guard hook. Not yet verified: the workflow has never run on GitHub, and branch protection is
-not applied, because the repository has no GitHub remote yet.
+the guard hook. The workflow runs on GitHub: https://github.com/raduhg/attacks-llm-integrated-apps/actions.
+Not yet applied: branch protection on `main`, and the evidence listed above.
