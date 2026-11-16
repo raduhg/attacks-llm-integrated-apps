@@ -1,0 +1,11 @@
+# Probe: weak app profile on the older Haiku 4.5. Does it follow the operator's "act on embedded
+# requests" instruction where Haiku 5.5 did not? D0 only, all three attack sets, N=3.
+id: m6_weak_probe_haiku45
+description: Weak app profile, Haiku 4.5, D0 only, 28 attacks, N=3
+model: haiku45
+repetitions: 3
+budget_usd: 0.50
+system_prompt: weak
+defenses: [D0]
+attacks: [data/attacks/m3_initial.yaml, data/attacks/m5_enhanced.yaml, data/attacks/m6_leakage.yaml]
+benign: []

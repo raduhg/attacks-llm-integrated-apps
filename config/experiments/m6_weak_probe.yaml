@@ -1,0 +1,11 @@
+# Probe: is the deliberately weak app profile actually exploitable at baseline?
+# D0 only, all three attack sets, N=3. Run this before the full weak-profile matrix.
+id: m6_weak_probe
+description: Weak app profile, D0 only, 28 attacks (exfiltration base + enhanced, leakage), N=3
+model: haiku
+repetitions: 3
+budget_usd: 0.20
+system_prompt: weak
+defenses: [D0]
+attacks: [data/attacks/m3_initial.yaml, data/attacks/m5_enhanced.yaml, data/attacks/m6_leakage.yaml]
+benign: []

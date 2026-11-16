@@ -1,0 +1,11 @@
+# Weak app profile under every defense: here the defenses have a vulnerable baseline to defend.
+# Compare with m5_defenses / m6_leakage (default profile), where the baseline ASR was already 0.
+id: m6_weak_defenses
+description: Weak app profile, D0-D6 (+ D1-LLM, D3-dm), 28 attacks + 11 benign tasks, N=5
+model: haiku
+repetitions: 5
+budget_usd: 2.0
+system_prompt: weak
+defenses: [D0, D1, D1-LLM, D2, D3, D3-dm, D4, D5, D6]
+attacks: [data/attacks/m3_initial.yaml, data/attacks/m5_enhanced.yaml, data/attacks/m6_leakage.yaml]
+benign: [data/benign_tasks/m2_smoke.yaml]

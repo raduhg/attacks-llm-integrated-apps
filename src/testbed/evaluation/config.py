@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Literal
 
 import yaml
 from pydantic import BaseModel, Field, field_validator
@@ -20,6 +21,8 @@ class ExperimentConfig(BaseModel):
     repetitions: int = Field(5, ge=1)
     budget_usd: float = Field(gt=0)
     corpus: str = "clean"
+    # App profile: "default" (realistic prompt) or "weak" (deliberately vulnerable; see assistant.py)
+    system_prompt: Literal["default", "weak"] = "default"
     defenses: list[str] = ["D0"]
     attacks: list[Path] = []  # attack catalogue files, relative to the project root
     benign: list[Path] = []  # benign task files, relative to the project root

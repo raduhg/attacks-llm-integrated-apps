@@ -1,0 +1,12 @@
+# The security comparison of the defenses: weak app profile on Haiku 4.5, where the baseline is
+# measurably vulnerable to canary leakage (probe: 50% ASR at D0). Leakage attacks plus the benign
+# set, under every defense. Exfiltration attacks are left out: they scored 0 here too.
+id: m6_weak_haiku45_defenses
+description: Weak profile, Haiku 4.5, D0-D6 (+ D1-LLM, D3-dm), 8 leakage attacks + 11 benign, N=5
+model: haiku45
+repetitions: 5
+budget_usd: 3.0
+system_prompt: weak
+defenses: [D0, D1, D1-LLM, D2, D3, D3-dm, D4, D5, D6]
+attacks: [data/attacks/m6_leakage.yaml]
+benign: [data/benign_tasks/m2_smoke.yaml]

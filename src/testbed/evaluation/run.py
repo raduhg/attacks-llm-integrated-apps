@@ -26,7 +26,7 @@ from importlib.metadata import version
 from pathlib import Path
 from typing import Any
 
-from testbed.app.assistant import Assistant
+from testbed.app.assistant import SYSTEM_PROMPTS, Assistant
 from testbed.app.rag import EMBEDDING_MODEL, TOP_K
 from testbed.app.tools import Sandbox, Searchable
 from testbed.app.trace import Trace
@@ -65,7 +65,8 @@ def run_attack(attack: Attack, ctx: dict[str, Any], defense: str, rep: int, trac
     sandbox, messages = prepare(attack, ctx["index"])
     trace = Trace(trace_path)
     trace.log("attack", id=attack.id, category=attack.category, vector=attack.vector, defense=defense, repetition=rep)
-    assistant = Assistant(ctx["backend"], sandbox, trace=trace, max_steps=ctx["max_steps"], defense=build_defense(defense))
+    assistant = Assistant(ctx["backend"], sandbox, system=ctx["system"], trace=trace, max_steps=ctx["max_steps"],
+                          defense=build_defense(defense))
     result = assistant.run(messages, repetition=rep)
     fired = attack_succeeded(attack.success, trace, sandbox)
     done = user_task_completed(ctx["tasks"][attack.user_task], trace) if attack.user_task else None
@@ -81,8 +82,8 @@ def run_attack(attack: Attack, ctx: dict[str, Any], defense: str, rep: int, trac
 def run_benign(task: BenignTask, ctx: dict[str, Any], defense: str, rep: int, trace_path: Path) -> dict[str, Any]:
     trace = Trace(trace_path)
     trace.log("benign_task", id=task.id, defense=defense, repetition=rep)
-    assistant = Assistant(ctx["backend"], Sandbox(ctx["index"]), trace=trace, max_steps=ctx["max_steps"],
-                          defense=build_defense(defense))
+    assistant = Assistant(ctx["backend"], Sandbox(ctx["index"]), system=ctx["system"], trace=trace,
+                          max_steps=ctx["max_steps"], defense=build_defense(defense))
     result = assistant.run([{"role": "user", "content": task.prompt}], repetition=rep)
     failures = check_task(task, result.answer, trace.of("tool_call"))
     trace.log("benign_result", passed=not failures, failures=failures)
@@ -97,7 +98,8 @@ def run_experiment(cfg: ExperimentConfig, backend: AnthropicBackend, index: Sear
     """Run the whole matrix, writing runs.jsonl as it goes. Returns a status dict."""
     attacks = [a for p in cfg.attacks for a in load_attacks(PROJECT_ROOT / p)]
     benign = [t for p in cfg.benign for t in load_tasks(PROJECT_ROOT / p)]
-    ctx = {"backend": backend, "index": index, "tasks": tasks_by_id(), "max_steps": cfg.max_steps}
+    ctx = {"backend": backend, "index": index, "tasks": tasks_by_id(), "max_steps": cfg.max_steps,
+           "system": SYSTEM_PROMPTS[cfg.system_prompt]}
     items: list[tuple[str, Any]] = [("attack", a) for a in attacks] + [("benign", t) for t in benign]
 
     out.mkdir(parents=True, exist_ok=True)

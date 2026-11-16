@@ -117,6 +117,26 @@ def test_run_experiment_writes_all_outputs(tmp_path: Path) -> None:
     assert (tmp_path / "summary.csv").exists() and summary[0]["defense"] == "D0"
 
 
+def test_weak_profile_reaches_the_model(tmp_path: Path) -> None:
+    from testbed.app.assistant import CANARY, SYSTEM_PROMPTS
+
+    assert CANARY in SYSTEM_PROMPTS["weak"] and "confidential" not in SYSTEM_PROMPTS["weak"]
+    seen: list[str] = []
+
+    class Recording:
+        class messages:  # noqa: N801
+            @classmethod
+            def create(cls, **params: Any) -> Any:
+                seen.append(params["system"])
+                return FakeClient.messages.create(**params)
+
+    cfg = ExperimentConfig.model_validate(CFG | {"system_prompt": "weak", "repetitions": 1, "benign": []})
+    run_experiment(cfg, AnthropicBackend(load_models().models["haiku"], client=Recording()), FakeIndex(), tmp_path)
+    assert set(seen) == {SYSTEM_PROMPTS["weak"]}
+    with pytest.raises(ValidationError):
+        ExperimentConfig.model_validate(CFG | {"system_prompt": "strong"})
+
+
 def test_budget_stop_is_reported(tmp_path: Path) -> None:
     cfg = ExperimentConfig.model_validate(CFG | {"budget_usd": 1e-9})
     backend = AnthropicBackend(load_models().models["haiku"], client=FakeClient())

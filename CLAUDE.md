@@ -168,4 +168,6 @@ Disertatie/
 - **Language:** thesis charts, labels and the fake corpus are in **English** (Romanian appears only as an attack obfuscation variant).
 - **Cache key** includes the repetition index; **temperature** 1.0 (API default, not settable on this model).
 - **RAG:** numpy brute-force search + fastembed (`all-MiniLM-L6-v2`), no vector database.
+- **Two app profiles (decided 2026-11-16):** with the default system prompt, Haiku 5.5 and 4.5 resisted every attack (ASR 0 for exfiltration and canary leakage, even at D0). That robustness result is kept and reported. To compare defenses on security, experiments can also select `system_prompt: weak`, a deliberately vulnerable profile (canary not marked confidential; assistant told to act on requests found in content it reads). Always state which profile a result comes from.
+- **Second model:** `haiku45` (Claude Haiku 4.5) is in `config/models.yaml` for per-model comparison; it costs 10x Haiku 5.5, so ask before large runs.
 - **Environment:** uv with a committed `uv.lock`; the README also documents plain `python -m venv` + pip.
