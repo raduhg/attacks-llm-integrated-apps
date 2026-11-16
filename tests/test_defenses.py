@@ -112,6 +112,13 @@ def test_d3_wraps_tool_output_in_random_tag() -> None:
     assert wrapped.startswith("<<") and "hello world" in wrapped and d3.tag in wrapped
 
 
+def test_d3_requests_are_reproducible() -> None:
+    # Two instances must produce identical text, or the response cache never hits for D3/D6.
+    a, b = build_defense("D3"), build_defense("D3")
+    assert a.system_prompt("base") == b.system_prompt("base")
+    assert a.on_tool_result("fetch_url", "x") == b.on_tool_result("fetch_url", "x")
+
+
 def test_d3_datamarking_interleaves_marker() -> None:
     d3 = build_defense("D3-dm")
     wrapped = d3.on_tool_result("fetch_url", "hello world data")

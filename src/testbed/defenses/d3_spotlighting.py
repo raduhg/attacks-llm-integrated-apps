@@ -1,21 +1,22 @@
 """D3 Spotlighting / delimiting: mark untrusted tool output clearly as data.
 
 Two variants (Hines et al., "Defending Against Indirect Prompt Injection by Spotlighting"):
-  - D3     delimiting: each tool result is wrapped in a tagged block whose tag carries a random
-           ID generated per run. Injected text cannot forge the closing tag, and the system
+  - D3     delimiting: each tool result is wrapped in a tagged block whose tag carries an ID
+           the attacker does not know. Injected text cannot forge the closing tag, and the system
            prompt tells the model that anything inside the block is data, not instructions.
   - D3-dm  datamarking: in addition, a marker character is interleaved between the words of the
            untrusted text, so it visibly reads as data and cannot blend into normal prose.
 
-The random tag ID is fixed per run (stable within a conversation, so the model sees a consistent
-delimiter), which keeps the cache key stable for a given (attack, repetition).
+shortcut: the tag ID is a fixed constant, so requests are identical across re-runs and the
+response cache works (a random tag made every D3/D6 run a new paid call). The static attack
+payloads here never try to guess the tag; a real deployment must generate it per conversation.
 """
 
 from __future__ import annotations
 
-import secrets
-
 from testbed.defenses.base import Defense
+
+TAG = "untrusted-5d2f81c4"
 
 MARKER = "▁"  # ▁ lower-one-eighth block: rare in normal text, visible as a datamark
 
@@ -35,8 +36,7 @@ class D3Spotlighting(Defense):
         self.datamark = datamark
         if datamark:
             self.name = "D3-dm"
-        # Per-instance random tag: unguessable, so injected text can't close the block early.
-        self.tag = secrets.token_hex(4)
+        self.tag = TAG
 
     def system_prompt(self, base: str) -> str:
         return base + spotlight_system(self.tag)
