@@ -29,6 +29,25 @@ def test_evaluate_counts_a_perfect_predictor() -> None:
     assert (s.tp, s.tn, s.fp, s.fn) == (1, 1, 0, 0) and s.f1 == 1.0
 
 
+def test_regex_run_saves_scores_with_provenance(tmp_path) -> None:  # type: ignore[no-untyped-def]
+    import json
+
+    from testbed.defenses.detector_eval import main
+
+    main(["--split", "test", "--limit", "20", "--out", str(tmp_path)])  # regex only: free, no API
+    record = json.loads((tmp_path / "test.json").read_text(encoding="utf-8"))
+    assert record["prompts"] == 20 and set(record["detectors"]) == {"regex"}
+    assert record["detectors"]["regex"]["n"] == 20
+    assert record["dataset_revision"].startswith("4f61ecb") and record["git_commit"]
+
+
+def test_dry_run_saves_nothing(tmp_path) -> None:  # type: ignore[no-untyped-def]
+    from testbed.defenses.detector_eval import main
+
+    main(["--split", "test", "--limit", "3", "--llm", "--dry-run", "--out", str(tmp_path)])
+    assert list(tmp_path.iterdir()) == []
+
+
 def test_regex_on_real_data_has_signal() -> None:
     rows = load_split("test")
     assert len(rows) == 116
