@@ -1,0 +1,10 @@
+# Smoke test for the extended benign set: every task once at baseline (D0), to catch tasks
+# whose expected answer or tool the model handles differently before the N=5 defense runs.
+id: m6_benign_smoke
+description: Benign set B12-B40, Haiku 5.5, default profile, D0, N=1
+model: haiku
+repetitions: 1
+budget_usd: 0.10
+defenses: [D0]
+attacks: []
+benign: [data/benign_tasks/m6_extended.yaml]

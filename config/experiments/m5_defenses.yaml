@@ -1,11 +1,11 @@
 # Milestone 5: all defense settings over the base and enhanced attack sets plus benign tasks.
 #   python -m testbed.evaluation.run config/experiments/m5_defenses.yaml --dry-run
 id: m5_defenses
-description: D0-D6 (+ D1-LLM, D3-dm), 10 base + 10 enhanced attacks, 11 benign tasks, N=5
+description: D0-D6 (+ D1-LLM, D3-dm), 10 base + 10 enhanced attacks, 40 benign tasks, N=5
 model: haiku
 repetitions: 5
 budget_usd: 2.0
 corpus: clean
 defenses: [D0, D1, D1-LLM, D2, D3, D3-dm, D4, D5, D6]
 attacks: [data/attacks/m3_initial.yaml, data/attacks/m5_enhanced.yaml]
-benign: [data/benign_tasks/m2_smoke.yaml]
+benign: [data/benign_tasks/m2_smoke.yaml, data/benign_tasks/m6_extended.yaml]

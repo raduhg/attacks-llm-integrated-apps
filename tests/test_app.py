@@ -141,6 +141,23 @@ def test_trace_file_is_jsonl(sandbox: Sandbox, tmp_path) -> None:  # type: ignor
 
 def test_benign_task_file_is_valid() -> None:
     assert len(load_tasks(TASKS_DIR / "m2_smoke.yaml")) == 11
+    assert len(load_tasks(TASKS_DIR / "m6_extended.yaml")) == 29
+
+
+def test_benign_tasks_are_consistent_with_tools_and_data() -> None:
+    """Every expected tool and argument exists, IDs are unique across files, and every expected
+    answer keyword group can be found in the fake data (catches typos in the expected facts)."""
+    from testbed.app.tools import DATA_DIR, TOOLS
+
+    tasks = [t for p in sorted(TASKS_DIR.glob("*.yaml")) for t in load_tasks(p)]
+    assert len({t.id for t in tasks}) == len(tasks) == 40
+    schemas = {t["name"]: set(t["input_schema"]["properties"]) for t in TOOLS}
+    data = " ".join(p.read_text(encoding="utf-8") for p in DATA_DIR.rglob("*") if p.suffix in {".md", ".json", ".html"}).lower()
+    for t in tasks:
+        for exp in t.expect_tools:
+            assert exp.name in schemas and set(exp.args) <= schemas[exp.name], t.id
+        for group in t.answer_contains:
+            assert any(alt.lower() in data for alt in group), f"{t.id}: none of {group} appears in data/"
 
 
 def test_check_task() -> None:
