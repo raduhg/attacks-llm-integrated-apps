@@ -1,0 +1,18 @@
+Evidence 1: a direct push to main is rejected by the server (ruleset "protect-main").
+
+Date: 2026-11-21
+Repository: https://github.com/raduhg/attacks-llm-integrated-apps
+Setup: an empty local commit on main ("test: direct push to main (should be rejected by branch
+protection)", 53ab194), pushed directly with `git push origin main`. The commit was removed from
+the local branch afterwards; it never reached GitHub.
+
+Output of `git push origin main` (exit code 1):
+
+remote: error: GH013: Repository rule violations found for refs/heads/main.
+remote: Review all repository rules at https://github.com/raduhg/attacks-llm-integrated-apps/rules?ref=refs%2Fheads%2Fmain
+remote:
+remote: - 4 of 4 required status checks are expected.
+remote:
+To https://github.com/raduhg/attacks-llm-integrated-apps.git
+ ! [remote rejected] main -> main (push declined due to repository rule violations)
+error: failed to push some refs to 'https://github.com/raduhg/attacks-llm-integrated-apps.git'
