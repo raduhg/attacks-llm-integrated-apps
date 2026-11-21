@@ -1,0 +1,63 @@
+{
+  "experiment": {
+    "id": "m5_defenses",
+    "description": "D0-D6 (+ D1-LLM, D3-dm), 10 base + 10 enhanced attacks, 40 benign tasks, N=5",
+    "model": "haiku",
+    "repetitions": 5,
+    "budget_usd": 2.0,
+    "corpus": "clean",
+    "system_prompt": "default",
+    "defenses": [
+      "D0",
+      "D1",
+      "D1-LLM",
+      "D2",
+      "D3",
+      "D3-dm",
+      "D4",
+      "D5",
+      "D6"
+    ],
+    "attacks": [
+      "data\\attacks\\m3_initial.yaml",
+      "data\\attacks\\m5_enhanced.yaml"
+    ],
+    "benign": [
+      "data\\benign_tasks\\m2_smoke.yaml",
+      "data\\benign_tasks\\m6_extended.yaml"
+    ],
+    "max_steps": 8,
+    "est_calls_per_run": 2.3
+  },
+  "model": {
+    "id": "claude-haiku-5-5",
+    "max_tokens": 8000,
+    "effort": "medium",
+    "thinking": null,
+    "price_per_mtok": {
+      "input": 0.1,
+      "output": 0.5,
+      "cache_read": 0.01,
+      "cache_write": 0.125
+    },
+    "dry_run_output_tokens": 600
+  },
+  "temperature": "API default (1.0); sampling parameters are not sent",
+  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "retrieval_top_k": 5,
+  "git_commit": "4a47937a4a16b2b988c6974fa37ce6fd9b604efc",
+  "git_dirty": false,
+  "started_utc": "2026-11-21T11:39:57+00:00",
+  "finished_utc": "2026-11-21T11:40:16+00:00",
+  "python": "3.11.9",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "packages": {
+    "anthropic": "2.6.0",
+    "fastembed": "0.9.1",
+    "pydantic": "2.14.3"
+  },
+  "spend": "0 API calls, 6060 cache hits, 0 in / 0 out tokens, spent $0.000000",
+  "status": "completed",
+  "runs_done": 2700,
+  "runs_planned": 2700
+}

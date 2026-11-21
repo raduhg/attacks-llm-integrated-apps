@@ -1,0 +1,51 @@
+{
+  "experiment": {
+    "id": "m6_benign_smoke",
+    "description": "Benign set B12-B40, Haiku 5.5, default profile, D0, N=1",
+    "model": "haiku",
+    "repetitions": 1,
+    "budget_usd": 0.1,
+    "corpus": "clean",
+    "system_prompt": "default",
+    "defenses": [
+      "D0"
+    ],
+    "attacks": [],
+    "benign": [
+      "data\\benign_tasks\\m6_extended.yaml"
+    ],
+    "max_steps": 8,
+    "est_calls_per_run": 2.3
+  },
+  "model": {
+    "id": "claude-haiku-5-5",
+    "max_tokens": 8000,
+    "effort": "medium",
+    "thinking": null,
+    "price_per_mtok": {
+      "input": 0.1,
+      "output": 0.5,
+      "cache_read": 0.01,
+      "cache_write": 0.125
+    },
+    "dry_run_output_tokens": 600
+  },
+  "temperature": "API default (1.0); sampling parameters are not sent",
+  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "retrieval_top_k": 5,
+  "git_commit": "4a47937a4a16b2b988c6974fa37ce6fd9b604efc",
+  "git_dirty": false,
+  "started_utc": "2026-11-21T11:41:17+00:00",
+  "finished_utc": "2026-11-21T11:41:18+00:00",
+  "python": "3.11.9",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "packages": {
+    "anthropic": "2.6.0",
+    "fastembed": "0.9.1",
+    "pydantic": "2.14.3"
+  },
+  "spend": "0 API calls, 59 cache hits, 0 in / 0 out tokens, spent $0.000000",
+  "status": "completed",
+  "runs_done": 29,
+  "runs_planned": 29
+}

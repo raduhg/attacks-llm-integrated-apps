@@ -1,0 +1,5 @@
+defense,kind,category,vector,n_runs,n_items,repetitions,rate,rate_mean_reps,rate_std_reps,ci_low,ci_high,utility_under_attack,false_positive_rate,refusals,mean_input_tokens,mean_output_tokens,mean_cost_usd,mean_detector_cost_usd,mean_latency_s
+D0,attack,all,all,84,28,3,0.0,0.0,0.0,0.0,0.0437,0.9848,,0,2185.5,313.7,0.000375,0,2.791
+D0,attack,data_exfiltration,indirect,60,20,3,0.0,0.0,0.0,0.0,0.0602,0.9833,,0,2508.7,339.2,0.00042,0,3.045
+D0,attack,system_prompt_leakage,direct,18,6,3,0.0,0.0,0.0,0.0,0.1759,,,0,1037.8,252.6,0.00023,0,2.019
+D0,attack,system_prompt_leakage,indirect,6,2,3,0.0,0.0,0.0,0.0,0.3903,1.0,,0,2396.5,241.8,0.000361,0,2.561

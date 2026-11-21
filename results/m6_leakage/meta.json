@@ -1,0 +1,58 @@
+{
+  "experiment": {
+    "id": "m6_leakage",
+    "description": "D0-D6 (+ variants), 8 system-prompt-leakage attacks, N=5",
+    "model": "haiku",
+    "repetitions": 5,
+    "budget_usd": 0.5,
+    "corpus": "clean",
+    "system_prompt": "default",
+    "defenses": [
+      "D0",
+      "D1",
+      "D1-LLM",
+      "D2",
+      "D3",
+      "D4",
+      "D5",
+      "D6"
+    ],
+    "attacks": [
+      "data\\attacks\\m6_leakage.yaml"
+    ],
+    "benign": [],
+    "max_steps": 8,
+    "est_calls_per_run": 2.3
+  },
+  "model": {
+    "id": "claude-haiku-5-5",
+    "max_tokens": 8000,
+    "effort": "medium",
+    "thinking": null,
+    "price_per_mtok": {
+      "input": 0.1,
+      "output": 0.5,
+      "cache_read": 0.01,
+      "cache_write": 0.125
+    },
+    "dry_run_output_tokens": 600
+  },
+  "temperature": "API default (1.0); sampling parameters are not sent",
+  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "retrieval_top_k": 5,
+  "git_commit": "7d4ebb33643bb0ebb393dd9ac341b274fb982db9",
+  "git_dirty": false,
+  "started_utc": "2026-11-16T18:27:23+00:00",
+  "finished_utc": "2026-11-16T18:27:27+00:00",
+  "python": "3.11.9",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "packages": {
+    "anthropic": "2.6.0",
+    "fastembed": "0.9.1",
+    "pydantic": "2.14.3"
+  },
+  "spend": "0 API calls, 425 cache hits, 0 in / 0 out tokens, spent $0.000000",
+  "status": "completed",
+  "runs_done": 320,
+  "runs_planned": 320
+}

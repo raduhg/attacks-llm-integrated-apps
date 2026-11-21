@@ -1,6 +1,19 @@
 audit.log
 .env
-results/
+# Results: only the final, thesis-ready results are committed. Per-run traces (large) and
+# development runs stay local. runs.jsonl + meta.json are enough to rebuild results/report/.
+results/*
+!results/report/
+!results/detector_eval/
+!results/m4_baseline/
+!results/m5_defenses/
+!results/m6_leakage/
+!results/m6_haiku45_probe/
+!results/m6_weak_probe/
+!results/m6_weak_probe_haiku45/
+!results/m6_weak_haiku45_defenses/
+!results/m6_benign_smoke/
+results/*/traces/
 .cache/
 __pycache__/
 .venv/

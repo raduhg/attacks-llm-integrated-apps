@@ -1,0 +1,53 @@
+{
+  "experiment": {
+    "id": "m6_weak_probe_haiku45",
+    "description": "Weak app profile, Haiku 4.5, D0 only, 28 attacks, N=3",
+    "model": "haiku45",
+    "repetitions": 3,
+    "budget_usd": 0.5,
+    "corpus": "clean",
+    "system_prompt": "weak",
+    "defenses": [
+      "D0"
+    ],
+    "attacks": [
+      "data\\attacks\\m3_initial.yaml",
+      "data\\attacks\\m5_enhanced.yaml",
+      "data\\attacks\\m6_leakage.yaml"
+    ],
+    "benign": [],
+    "max_steps": 8,
+    "est_calls_per_run": 2.3
+  },
+  "model": {
+    "id": "claude-haiku-4-5",
+    "max_tokens": 4000,
+    "effort": null,
+    "thinking": null,
+    "price_per_mtok": {
+      "input": 1.0,
+      "output": 5.0,
+      "cache_read": 0.1,
+      "cache_write": 1.25
+    },
+    "dry_run_output_tokens": 300
+  },
+  "temperature": "API default (1.0); sampling parameters are not sent",
+  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "retrieval_top_k": 5,
+  "git_commit": "7d4ebb33643bb0ebb393dd9ac341b274fb982db9",
+  "git_dirty": false,
+  "started_utc": "2026-11-16T18:28:01+00:00",
+  "finished_utc": "2026-11-16T18:28:03+00:00",
+  "python": "3.11.9",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "packages": {
+    "anthropic": "2.6.0",
+    "fastembed": "0.9.1",
+    "pydantic": "2.14.3"
+  },
+  "spend": "0 API calls, 150 cache hits, 0 in / 0 out tokens, spent $0.000000",
+  "status": "completed",
+  "runs_done": 84,
+  "runs_planned": 84
+}
