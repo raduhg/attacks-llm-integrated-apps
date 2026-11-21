@@ -33,10 +33,10 @@
   "temperature": "API default (1.0); sampling parameters are not sent",
   "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
   "retrieval_top_k": 5,
-  "git_commit": "48b028102f8889fa4c46311e40e9334d2e6baac3",
-  "git_dirty": true,
-  "started_utc": "2026-11-21T12:47:14+00:00",
-  "finished_utc": "2026-11-21T12:48:06+00:00",
+  "git_commit": "35116add22028ca9b3963853d345d6df8964bee9",
+  "git_dirty": false,
+  "started_utc": "2026-11-21T13:09:47+00:00",
+  "finished_utc": "2026-11-21T13:09:48+00:00",
   "python": "3.11.9",
   "platform": "Windows-10-10.0.26200-SP0",
   "packages": {
@@ -44,7 +44,7 @@
     "fastembed": "0.9.1",
     "pydantic": "2.14.3"
   },
-  "spend": "45 API calls, 45 cache hits, 59707 in / 2726 out tokens, spent $0.073337",
+  "spend": "0 API calls, 90 cache hits, 0 in / 0 out tokens, spent $0.000000",
   "status": "completed",
   "runs_done": 45,
   "runs_planned": 45

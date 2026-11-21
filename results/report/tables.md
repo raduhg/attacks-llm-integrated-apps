@@ -71,4 +71,4 @@ Positive class = injection. Produced by `python -m testbed.defenses.detector_eva
 - `m6_haiku45_probe`: Model Haiku 4.5, default profile, N=3, commit 7d4ebb3, finished 2026-11-16T18:27:40+00:00.
 - `m6_weak_probe`: Model Haiku 5.5, weak profile, N=3, commit 7d4ebb3, finished 2026-11-16T18:27:51+00:00.
 - `m6_weak_probe_haiku45`: Model Haiku 4.5, weak profile, N=3, commit 7d4ebb3, finished 2026-11-16T18:28:03+00:00.
-- `m6_tool_abuse_probe`: Model Haiku 4.5, weak profile, N=3, commit 48b0281 (uncommitted changes), finished 2026-11-21T12:48:06+00:00.
+- `m6_tool_abuse_probe`: Model Haiku 4.5, weak profile, N=3, commit 35116ad, finished 2026-11-21T13:09:48+00:00.
