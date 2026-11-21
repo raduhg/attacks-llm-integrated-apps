@@ -110,12 +110,14 @@ The D1 detectors are also scored on a labelled public dataset (deepset/prompt-in
 test prompts):
 
 ```
-uv run python -m testbed.defenses.detector_eval --split test          # regex only, free
-uv run python -m testbed.defenses.detector_eval --split test --llm    # plus LLM detector, about $0.005
+uv run python -m testbed.defenses.detector_eval --split test                   # regex only, free
+uv run python -m testbed.defenses.detector_eval --split test --llm --dry-run   # planned LLM calls
+uv run python -m testbed.defenses.detector_eval --split test --llm             # plus LLM detector, about $0.005
 ```
 
-Result on the test split: regex precision 1.000, recall 0.050; LLM detector precision 1.000,
-recall 0.567. This result is printed, not saved under `results/`.
+Each run saves its scores with provenance to `results/detector_eval/<split>.json`, and the
+reporting command adds them to `tables.md`. Result on the test split: regex precision 1.000,
+recall 0.050; LLM detector (Haiku 5.5) precision 1.000, recall 0.567.
 
 ## Headline results
 

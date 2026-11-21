@@ -65,3 +65,16 @@ def test_build_report_writes_every_output(tmp_path: Path) -> None:
             "defenses_m6_weak_haiku45_defenses.csv", "defenses_m5_defenses.csv"} <= names
     tables = (out / "tables.md").read_text(encoding="utf-8")
     assert "| D0 | 4/4 (100%" in tables and "Haiku 4.5, weak profile" in tables
+    assert "D1 detector accuracy" not in tables  # no detector results: no section
+
+
+def test_report_includes_saved_detector_scores(tmp_path: Path) -> None:
+    write_exp(tmp_path, "m5_defenses", [attack("D0", False, "data_exfiltration"), benign("D0", True)])
+    s = {"n": 10, "tp": 3, "fp": 0, "tn": 5, "fn": 2, "precision": 1.0, "recall": 0.6, "f1": 0.75, "accuracy": 0.8}
+    (tmp_path / "detector_eval").mkdir()
+    (tmp_path / "detector_eval" / "test.json").write_text(json.dumps({
+        "split": "test", "prompts": 10, "detectors": {"regex": s, "llm": s}, "llm_model": "claude-haiku-5-5",
+        "dataset_revision": "4f61ecb0", "git_commit": "abcdef1", "git_dirty": False, "finished_utc": "2026-11-21"}))
+    tables = (build_report(results=tmp_path) / "tables.md").read_text(encoding="utf-8")
+    assert "| test | regex | 10 | 3 | 0 | 5 | 2 | 1.000 | 0.600 | 0.750 | 0.800 |" in tables
+    assert "LLM (claude-haiku-5-5)" in tables
