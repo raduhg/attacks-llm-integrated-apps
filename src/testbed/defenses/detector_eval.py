@@ -163,13 +163,13 @@ def save(record: dict, out: Path) -> Path:
     """Write the scores with their provenance to <out>/<split>.json."""
     from datetime import datetime, timezone
 
-    from testbed.evaluation.run import _git
+    from testbed.evaluation.run import git_state
 
     record |= {
         "dataset": "deepset/prompt-injections",
         "dataset_revision": DATASET_REVISION,
-        "git_commit": _git("rev-parse", "HEAD"),
-        "git_dirty": _git("status", "--porcelain") not in ("", "unknown"),
+        "git_commit": (git := git_state())[0],
+        "git_dirty": git[1],
         "finished_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }
     out.mkdir(parents=True, exist_ok=True)

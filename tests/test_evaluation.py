@@ -136,6 +136,30 @@ def test_weak_profile_reaches_the_model(tmp_path: Path) -> None:
         ExperimentConfig.model_validate(CFG | {"system_prompt": "strong"})
 
 
+def test_git_state_ignores_results_folder(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    import subprocess
+
+    import testbed.evaluation.run as run
+
+    def git(*args: str) -> None:
+        cmd = ["git", "-c", "user.name=t", "-c", "user.email=t@t", *args]  # git from PATH, as in run.py
+        subprocess.run(cmd, cwd=tmp_path, check=True, capture_output=True)  # noqa: S607
+
+    (tmp_path / "results").mkdir()
+    (tmp_path / "code.py").write_text("x = 1\n")
+    (tmp_path / "results" / "runs.jsonl").write_text("{}\n")
+    git("init", "-q")
+    git("add", ".")
+    git("commit", "-q", "-m", "init")
+    monkeypatch.setattr(run, "PROJECT_ROOT", tmp_path)
+
+    assert run.git_state()[1] is False
+    (tmp_path / "results" / "runs.jsonl").write_text('{"rewritten": true}\n')  # a re-run rewrites its output
+    assert run.git_state()[1] is False
+    (tmp_path / "code.py").write_text("x = 2\n")  # a code change is dirty
+    assert run.git_state()[1] is True
+
+
 def test_budget_stop_is_reported(tmp_path: Path) -> None:
     cfg = ExperimentConfig.model_validate(CFG | {"budget_usd": 1e-9})
     backend = AnthropicBackend(load_models().models["haiku"], client=FakeClient())
