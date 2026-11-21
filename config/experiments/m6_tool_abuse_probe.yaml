@@ -1,0 +1,11 @@
+# Probe: are the AgentDojo tool-abuse attacks effective on the vulnerable setup?
+# Haiku 4.5, weak profile, no defense, N=3. Run before the full defense matrix.
+id: m6_tool_abuse_probe
+description: AgentDojo tool abuse (15 attacks), Haiku 4.5, weak profile, D0, N=3
+model: haiku45
+repetitions: 3
+budget_usd: 0.40
+system_prompt: weak
+defenses: [D0]
+attacks: [data/attacks/m6_tool_abuse.yaml]
+benign: []

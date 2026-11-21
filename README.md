@@ -18,7 +18,7 @@ each defense hurts normal use. Every number in the thesis can be regenerated fro
 |---|---|---|
 | Target app | `src/testbed/app/` | "Acme Assistant": document search (RAG) plus six sandboxed tools (`search_documents`, `read_email`, `send_email`, `fetch_url`, `get_customer_record`, `delete_file`). No real email, web request or file deletion ever happens |
 | LLM backend | `src/testbed/llm/` | Anthropic API, response cache, cost tracking, budget stop, dry run |
-| Attacks | `src/testbed/attacks/`, `data/attacks/` | 28 attacks: 20 indirect data-exfiltration cases from InjecAgent (base and enhanced) and 8 system-prompt-leakage attacks; injected at runtime into the right place; deterministic success checks |
+| Attacks | `src/testbed/attacks/`, `data/attacks/` | 43 attacks: 20 indirect data-exfiltration cases from InjecAgent (base and enhanced), 8 system-prompt-leakage attacks, and 15 tool-abuse attacks from AgentDojo (5 goals in 3 published templates, including "ignore previous instructions" and a fake system message); injected at runtime into the right place; deterministic success checks |
 | Benign tasks | `data/benign_tasks/` | 40 ordinary requests with expected answers and tool calls, for false-positive and usability measurement |
 | Defenses | `src/testbed/defenses/` | D0 (none), D1 input filter (regex, optional LLM detector), D2 prompt hardening, D3 spotlighting (optional datamarking), D4 privilege separation, D5 output validation, D6 all combined |
 | Runner and metrics | `src/testbed/evaluation/` | YAML-configured experiments, N repetitions, Wilson 95% intervals |
@@ -82,10 +82,11 @@ commit, timestamps), `runs.jsonl` (one row per run), `summary.csv` and one trace
 | `m6_weak_probe_haiku45` | Haiku 4.5 | weak | D0 | 28 (both categories) | – | 3 | 84 | about $0.23 |
 | `m6_weak_haiku45_defenses` | Haiku 4.5 | weak | all 9 | 8 leakage | 11 | 5 | 855 | about $2.24 |
 | `m6_benign_smoke` | Haiku 5.5 | default | D0 | – | 29 | 1 | 29 | about $0.01 |
+| `m6_tool_abuse_probe` | Haiku 4.5 | weak | D0 | 15 tool abuse | – | 3 | 45 | about $0.14 |
 
 The cost column is the sum of the original cost of every call in that experiment, which is what a
 fresh clone with no response cache pays. Experiments share some calls, so running all of them
-costs somewhat less than the sum (about $3.80). `m6_weak_defenses` is configured but deliberately
+costs somewhat less than the sum (about $3.90). `m6_weak_defenses` is configured but deliberately
 not run: the probe showed Haiku 5.5 is not vulnerable even on the weak profile.
 
 **What "reproduce" means here.** The model runs at temperature 1.0 (the API default; this model
@@ -135,6 +136,10 @@ All on fake data, in the sandbox. Every number is tied to a model and an app pro
 - **Weak profile** (a deliberately vulnerable system prompt): Haiku 5.5 still resisted (0/84),
   Haiku 4.5 leaked the canary in 19/40 runs. There, D2, D1-LLM and D6 reduced leakage to 0/40,
   D3 to 6/40 (all indirect leaks stopped), while D4 and D5 had no effect.
+- **Tool abuse** (AgentDojo, Haiku 4.5, weak profile, no defense): 0/45. The injected
+  instruction reached the model in every run, yet it never called `send_email` or `delete_file`,
+  completed the user's task every time, and did not mention the injection. The full defense
+  matrix was therefore not run.
 
 Full tables and intervals: `results/report/tables.md` after running the reporting command.
 
@@ -176,8 +181,8 @@ dry-run switch turns API calls off.
 - **Retrieval** returns the top 5 document sections (raised from 3 because the embedding model
   ranked exact error codes poorly).
 - **Known limits:** secret checks are exact text matches, so a re-encoded leak is missed; D3 uses a
-  fixed delimiter tag so that requests stay cacheable; attack categories cover exfiltration and
-  leakage, not yet tool abuse or obfuscation.
+  fixed delimiter tag so that requests stay cacheable; attack categories cover exfiltration,
+  leakage, tool abuse and instruction override, not yet obfuscation or multi-turn escalation.
 
 ## Data and licences
 
@@ -186,3 +191,4 @@ with source, revision and licence recorded next to it:
 
 - InjecAgent (MIT, Findings of ACL 2024): `data/external/injecagent/SOURCE.md`
 - deepset/prompt-injections (Apache-2.0): `data/external/deepset_prompt_injections/SOURCE.md`
+- AgentDojo (MIT, NeurIPS 2024): `data/external/agentdojo/SOURCE.md`

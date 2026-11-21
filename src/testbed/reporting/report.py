@@ -40,6 +40,7 @@ EXPERIMENTS: dict[str, tuple[str, str]] = {
     "m6_haiku45_probe": ("Haiku 4.5", "default"),
     "m6_weak_probe": ("Haiku 5.5", "weak"),
     "m6_weak_probe_haiku45": ("Haiku 4.5", "weak"),
+    "m6_tool_abuse_probe": ("Haiku 4.5", "weak"),
 }
 MATRICES = ["m6_weak_haiku45_defenses", "m5_defenses"]  # full defense matrices, most informative first
 
