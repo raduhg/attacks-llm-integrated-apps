@@ -79,14 +79,18 @@ Settings to apply on GitHub (Settings → Branches → Add branch ruleset, targe
 - Block force pushes. Restrict deletions.
 - Do not allow bypassing the above (include administrators).
 
-Evidence to collect once the repository is on GitHub:
+Ruleset `protect-main` is active (applied 2026-11-21). Evidence, in `docs/evidence/`:
 
-1. A direct `git push origin main` rejected by the server.
-2. A pull request with a failing check, showing the merge button blocked.
-3. The same pull request merged after the check passes.
+| # | What it shows | Where |
+|---|---|---|
+| 1 | A direct `git push origin main` is rejected by the server (GH013) | `01-direct-push-rejected.txt` |
+| 2 | A pull request whose `lint` check fails cannot be merged | `02-failing-check-blocks-merge.md` (pull request #2) |
+| 3 | A pull request is merged only after all four checks pass | `03-merge-after-checks-pass.md` (pull request #1) |
+
+Screenshots of the merge boxes go in the same folder (`02-*.png`, `03-*.png`).
 
 ## Status
 
-Implemented and verified locally: lint, tests, dependency audit, build, the pre-commit hook and
-the guard hook. The workflow runs on GitHub: https://github.com/raduhg/attacks-llm-integrated-apps/actions.
-Not yet applied: branch protection on `main`, and the evidence listed above.
+Implemented and verified: lint, tests, dependency audit, build, the pre-commit hook and the guard
+hook, locally and on GitHub (https://github.com/raduhg/attacks-llm-integrated-apps/actions).
+Branch protection on `main` is active and its three pieces of evidence are recorded above.
