@@ -82,10 +82,26 @@ def test_leakage_catalogue() -> None:
     assert load_attacks(ATTACKS_DIR / "m6_leakage.yaml") == attacks  # committed file is up to date
 
 
+def test_agentdojo_conversion() -> None:
+    from testbed.attacks.import_agentdojo import TASKS, TEMPLATES, convert
+
+    attacks = convert()
+    assert len(attacks) == len(TASKS) * len(TEMPLATES) == 15 and len({a.id for a in attacks}) == 15
+    assert all(a.category == "tool_abuse" and a.injection_point == "tool_output" for a in attacks)
+    assert not any(p in a.payload for a in attacks for p in ("{goal}", "{user}", "{model}"))
+    assert all(a.goal in a.payload for a in attacks)  # the template wraps the dataset's goal verbatim
+    assert {a.success[0].tool for a in attacks} == {"send_email", "delete_file"}
+    assert load_attacks(ATTACKS_DIR / "m6_tool_abuse.yaml") == attacks  # committed file is up to date
+
+
+def test_all_attack_ids_are_unique_across_files() -> None:
+    ids = [a.id for p in sorted(ATTACKS_DIR.glob("*.yaml")) for a in load_attacks(p)]
+    assert len(ids) == len(set(ids))
+
+
 def test_user_task_links_match_benign_prompts() -> None:
     tasks = tasks_by_id()
-    files = ["m3_initial.yaml", "m5_enhanced.yaml", "m6_leakage.yaml"]
-    for f in files:
+    for f in sorted(p.name for p in ATTACKS_DIR.glob("*.yaml")):
         for a in load_attacks(ATTACKS_DIR / f):
             if a.user_task:
                 assert a.user_task in tasks and tasks[a.user_task].prompt == a.user_prompt, a.id

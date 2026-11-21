@@ -13,6 +13,7 @@ results/*
 !results/m6_weak_probe_haiku45/
 !results/m6_weak_haiku45_defenses/
 !results/m6_benign_smoke/
+!results/m6_tool_abuse_probe/
 results/*/traces/
 .cache/
 __pycache__/
