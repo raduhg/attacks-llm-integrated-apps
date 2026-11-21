@@ -144,6 +144,14 @@ def _git(*args: str) -> str:
         return "unknown"
 
 
+def git_state() -> tuple[str, bool]:
+    """(commit hash, dirty). Changes under results/ do not count as dirty: the final results are
+    committed, so re-running an experiment rewrites its own tracked output files, which says
+    nothing about the code that produced them."""
+    status = _git("status", "--porcelain", "--", ".", ":(exclude)results")
+    return _git("rev-parse", "HEAD"), status not in ("", "unknown")
+
+
 def write_meta(cfg: ExperimentConfig, backend: AnthropicBackend, out: Path, status: dict[str, Any], started: str) -> None:
     meta = {
         "experiment": cfg.model_dump(mode="json"),
@@ -151,8 +159,8 @@ def write_meta(cfg: ExperimentConfig, backend: AnthropicBackend, out: Path, stat
         "temperature": "API default (1.0); sampling parameters are not sent",
         "embedding_model": EMBEDDING_MODEL,
         "retrieval_top_k": TOP_K,
-        "git_commit": _git("rev-parse", "HEAD"),
-        "git_dirty": _git("status", "--porcelain") not in ("", "unknown"),
+        "git_commit": (git := git_state())[0],
+        "git_dirty": git[1],
         "started_utc": started,
         "finished_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "python": sys.version.split()[0],
