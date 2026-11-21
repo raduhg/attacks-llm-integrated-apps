@@ -1,0 +1,2 @@
+defense,kind,category,vector,n_runs,n_items,repetitions,rate,rate_mean_reps,rate_std_reps,ci_low,ci_high,utility_under_attack,false_positive_rate,refusals,mean_input_tokens,mean_output_tokens,mean_cost_usd,mean_detector_cost_usd,mean_latency_s
+D0,benign,all,all,29,29,1,1.0,1.0,0.0,0.883,1.0,,0.0,0,2337.5,156.7,0.000312,0,1.784

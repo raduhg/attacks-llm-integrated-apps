@@ -104,6 +104,11 @@ uv run python -m testbed.reporting.report
 This writes `results/report/`: `tables.md`, per-defense CSV files, and four charts
 (`fig_asr_heatmap.png`, `fig_asr_fpr.png`, `fig_tradeoff.png`, `fig_models.png`).
 
+**The final results are committed.** For each experiment in the table above, `runs.jsonl`,
+`meta.json` and `summary.csv` are in the repository, together with `results/report/` and
+`results/detector_eval/`. That is enough to rebuild the report from a fresh clone, with no API
+key and no cost. The per-run traces (about 30 MB) and development runs stay local.
+
 ### Detector accuracy (D1)
 
 The D1 detectors are also scored on a labelled public dataset (deepset/prompt-injections, 116
